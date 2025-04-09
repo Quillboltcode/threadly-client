@@ -1,0 +1,151 @@
+import axios from 'axios';
+import { Post } from '../types/post';
+import toast from 'react-hot-toast';
+
+
+const url = import.meta.env.VITE_API_URL ? 'http://localhost:8500/api' : 'https://api.example.com';
+// const url = 'http://localhost:8500/api';
+
+export interface CreatePostData {
+  content: string;
+  file?: File;
+  attachmentType?: string;
+}
+
+export class PostService  {
+  
+  // 
+/**
+ * Constructs and returns HTTP headers for API requests.
+ * 
+ * @param {boolean} requiresAuth - Indicates if the request requires authentication.
+ * @param {boolean} isFormData - Indicates if the content type should be 'multipart/form-data'.
+ * @returns {Record<string, string>} - An object containing the appropriate headers.
+ * @throws {Error} - Throws an error if authentication is required but no token is found.
+ */private static getHeaders(requiresAuth: boolean = false, isFormData: boolean = false): Record<string, string> {
+    const headers: Record<string, string> = {};
+    
+    if (isFormData) {
+      headers['Content-Type'] = 'multipart/form-data';
+    } else {
+      headers['Content-Type'] = 'application/json';
+    }
+    
+    if (requiresAuth) {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return headers;
+  }
+
+
+
+  // api/posts?page=1&limit=10
+  static async getPosts(page = 1, limit = 10): Promise<Post[]> {
+    const response = await axios.get(`${url}/posts?page=${page}&limit=${limit}`);
+    // respone are :
+    /* {
+      "totalPosts": 5,
+      "page": 1,
+      "totalPages": 1,
+      "limit": 10,
+      "posts": [
+        {
+          "content": "Just finished a 10K run! 🏃‍♂️",
+          "tags": [
+            "fitness",
+            "running"
+          ],
+          "author": {},
+          "image": [],
+          "likeCount": 39,
+          "commentCount": 0,
+          "createdAt": {},
+          "updatedAt": {}
+        }, */
+        const posts = response.data.posts.map((post: any) => ({
+          id: post._id,
+          content: post.content,
+          tag: post.tags,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
+          image: post.image,
+          like: post.likeCount,// assuming share count is not provided in the response
+          comment: post.commentCount,
+          author: {
+            name: post.author.username,
+            email: post.author.email,
+            avatar: post.author.avatar,
+          },
+        })) as Post[];
+      
+        return posts;
+      }
+
+  static async getSinglePost(id: string): Promise<any>{
+    if (!id) {
+      throw new Error('Post ID is required');
+    }
+
+    try {
+      const response = await axios.get(`${url}/posts/${id}`);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error("Axios error")
+        console.error(error.response?.data);
+      } else {
+        console.error(error);
+      }
+
+      throw error;
+    }
+  }
+
+  //Create post api with auth-header
+  static async createPost(formData: FormData): Promise<any> {
+    const response = await axios.post(`${url}/posts`, formData, {
+      headers: this.getHeaders(true, true),
+    });
+    return response.data;
+  }
+
+  //Update post api with auth-header
+  static async updatePost(id: string, post: any): Promise<any>{
+    const response = await axios.put(`${url}/posts/${id}`, post,{
+      headers: this.getHeaders(true, false),
+    });
+    return response.data;
+  }
+
+  //Delete post api with auth-header
+  static async  deletePost(id: string): Promise<any>{
+    const response = await axios.delete(`${url}/posts/${id}`,{
+      headers: this.getHeaders(true, false),  
+    });
+    return response.data;
+  }
+
+  static async getCommonTags(): Promise<any>{
+    try {
+      const response = await axios.get(`${url}/posts/tags`);
+      if (Array.isArray(response.data)) {
+        return response.data.map((tagData: any) => ({
+          tag: tagData.tag,
+          count: tagData.count,
+        }));
+      } else {
+        console.error('Unexpected response format:', response.data);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+      return [];
+    }
+  }
+
+}
