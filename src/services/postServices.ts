@@ -75,8 +75,12 @@ export class PostService  {
           updatedAt: post.updatedAt,
           image: post.image,
           like: post.likeCount,// assuming share count is not provided in the response
-          comment: post.commentCount,
+          comment: post.comment,
+          commentcount: post.commentCount,
           author: {
+            id: post.author._id,
+            firstname: post.author.firstname,
+            lastname: post.author.lastname,
             name: post.author.username,
             email: post.author.email,
             avatar: post.author.avatar,
@@ -92,7 +96,7 @@ export class PostService  {
     }
 
     try {
-      const response = await axios.get(`${url}/posts/${id}`);
+      const response = await axios.get(`${url}/posts/single/${id}`);
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -109,15 +113,16 @@ export class PostService  {
   //Create post api with auth-header
   static async createPost(formData: FormData): Promise<any> {
     const response = await axios.post(`${url}/posts`, formData, {
-      headers: this.getHeaders(true, true),
+      headers: PostService.getHeaders(true, true),
     });
+    
     return response.data;
   }
 
   //Update post api with auth-header
   static async updatePost(id: string, post: any): Promise<any>{
     const response = await axios.put(`${url}/posts/${id}`, post,{
-      headers: this.getHeaders(true, false),
+      headers: PostService.getHeaders(true, false),
     });
     return response.data;
   }
@@ -125,11 +130,11 @@ export class PostService  {
   //Delete post api with auth-header
   static async  deletePost(id: string): Promise<any>{
     const response = await axios.delete(`${url}/posts/${id}`,{
-      headers: this.getHeaders(true, false),  
+      headers: PostService.getHeaders(true, false),  
     });
     return response.data;
   }
-
+  // Get popular tag to display on right side bar
   static async getCommonTags(): Promise<any>{
     try {
       const response = await axios.get(`${url}/posts/tags`);
@@ -148,4 +153,29 @@ export class PostService  {
     }
   }
 
+  static async likePost(id: string): Promise<any> {
+    if (!id) {
+      throw new Error('Post ID is required');
+    }
+
+    const content = JSON.stringify  ({
+      id : id,
+      liked : true
+  })
+    try {
+      const response = await axios.post(`${url}/posts/${id}/like`, content
+        , {
+        headers: PostService.getHeaders(true, false),
+      });
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error liking post", error.response?.data);
+      } else {
+        console.error("Error liking post", error);
+      }
+
+      throw error;
+    }
+  }
 }

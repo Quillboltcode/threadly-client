@@ -29,11 +29,12 @@ const PostBox: React.FC<{ onClose: () => void, url: string }> = ({ onClose }) =>
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (e.target.value.length <= MAX_CHAR) {
       setText(e.target.value);
+      
     }
   };
 
@@ -270,12 +271,12 @@ const PostBox: React.FC<{ onClose: () => void, url: string }> = ({ onClose }) =>
 const NewPostButton: React.FC<NewPostButtonProps> = ({ mode, onClick, disabled }) => {
   if (mode === 'full') {
     return (
-      <div className="w-full p-4">
+      <div className="fixed bottom-20 left-4 z-[999]">
         <button
           aria-label="Create Post"
           disabled={disabled}
           onClick={onClick}
-          className="w-full bg-blue-500 text-white px-4 py-2 rounded-md flex items-center justify-center space-x-2"
+          className="w-full bg-blue-500 text-white px-4 py-2 rounded-md flex items-center"
         >
           <FaPen />
           <span>New Post</span>
@@ -284,7 +285,7 @@ const NewPostButton: React.FC<NewPostButtonProps> = ({ mode, onClick, disabled }
     );
   }
   return (
-    <div className="absolute bottom-4 left-4 z-[999]">
+    <div className="fixed bottom-4 md:hidden right-2 z-[999]">
       <button
         aria-label="Create Post"
         onClick={onClick}
@@ -320,9 +321,11 @@ const PostBoxModal: React.FC<{ mode: ScreenMode; isSidebar?: boolean }> = ({ mod
 
   return (
     <>
+     
       {/* Render the NewPostButton  with conditional user authentication*/}
       <NewPostButton mode={mode} isSidebar={isSidebar} onClick={openModal} />
       {isModalOpen && <PostBox onClose={closeModal} url={URL} />}
+      
     </>
   );
 };

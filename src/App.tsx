@@ -51,8 +51,10 @@ const App: React.FC = () => {
 
   return (
     <>
-<div className={`app ${isPostBoxOpen ? "" : ""} h-screen flex flex-row dark:bg-gray-900 dark:text-white bg-white text-black relative`}>
-      <LeftSidebar mode={leftSidebarMode} setMode={setLeftSidebarMode}>
+    <div className={`app ${isPostBoxOpen ? "" : ""} flex flex-row dark:bg-gray-900 dark:text-white bg-white text-black relative`}>
+      <LeftSidebar mode={leftSidebarMode} setMode={setLeftSidebarMode} >
+        {/* Conditionally render NewPostBox */}
+        {(leftSidebarMode === ScreenMode.Full|| leftSidebarMode === ScreenMode.Icon) && <PostBoxModal mode={leftSidebarMode}  />}
       </LeftSidebar>
       <main className='main md:w-1/2 w-full flex flex-col border border-gray-700'>
           <Outlet />

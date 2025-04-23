@@ -2,17 +2,28 @@ import React from 'react';
 import { FaArrowLeft } from "react-icons/fa";
 import EditProfileModal from '../components/ProfileForm';
 import ProfileTabs from '../components/ProfileTab';
+import { useAuth } from '../contexts/AuthContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 const Profile: React.FC = () => {
-  const user = {
-    avatar: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1931&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    username: 'John Doe',
-    email: 'jL2Q4@example.com',
-    followers: 100,
-    following: 50,
-    postcount: 50
-  };
+  // const user = {
+  //   avatar: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1931&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  //   username: 'John Doe',
+  //   email: 'jL2Q4@example.com',
+  //   followers: 100,
+  //   following: 50,
+  //   postcount: 50
+  // };
 
+  const { user, isLoading, isAuthenticated} = useAuth();
 
+  //todo add count for followers, following, and posts
+  const followers_count = (user as any).followers?.length;
+  const following_count = (user as any).following?.length;
+  // const postCount = user.posts.length;
+
+  if (!user || isLoading) {
+    return <LoadingSpinner/>
+  }
   return (
     <div className="bg-gray-900 text-white w-ful">
       {/* Back Button */}
@@ -51,13 +62,10 @@ const Profile: React.FC = () => {
         {/* Follower & Following Count */}
         <div className="flex space-x-4 text-gray-400 text-sm mt-2">
           <span>
-            <span className="text-white font-semibold">{user.followers}</span> follower
+            <span className="text-white font-semibold">{followers_count}</span> follower
           </span>
           <span>
-            <span className="text-white font-semibold">{user.following}</span> following
-          </span>
-          <span>
-            <span className="text-white font-semibold">{user.postcount}</span> posts
+            <span className="text-white font-semibold">{following_count}</span> following
           </span>
         </div>
       </div>

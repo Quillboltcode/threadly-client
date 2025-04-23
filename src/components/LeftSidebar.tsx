@@ -3,8 +3,7 @@ import { FaHome, FaSearch, FaBell, FaComment, FaStream, FaList, FaUser, FaCog } 
 import { CiMenuBurger } from 'react-icons/ci';
 import { NavLink } from 'react-router';
 import { ScreenMode } from '../App';
-import NewPostButton from './NewPostButton';
-import { usePosts } from '../hooks/usePost';
+
 
 
 interface LeftSidebarProps {
@@ -13,12 +12,12 @@ interface LeftSidebarProps {
   children? : React.ReactNode;
 }
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({ mode , setMode,children }) => {
+const LeftSidebar: React.FC<LeftSidebarProps> = ({ mode , setMode, children }) => {
   // const { data, isLoading, isError } = usePosts();
   // console.log(data)
   return (
     <div
-      className={`h-screen lg:ml-8 bg-gray-900 text-white flex flex-col transition-all border-b border-b-gray-700 duration-300
+      className={`h-screen sticky top-0 lg:ml-8 bg-gray-900 text-white flex flex-col transition-all border-l border-l-gray-700 duration-300
         ${mode === ScreenMode.Hidden ? 'w-0 overflow-hidden' : ''}
         ${mode === ScreenMode.Icon ? 'w-16' : ''}
         ${mode === ScreenMode.Full ? 'w-64' : ''}`}

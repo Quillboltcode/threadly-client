@@ -15,8 +15,11 @@ import MessagePage from "./pages/Message";
 import SettingsPage from "./pages/Settings/Setting";
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from "./components/PrivateRoute";
-import Login from "./components/Login";
 import AccountSettings from "./pages/Settings/Account";
+import LoginPage from "./pages/LoginPage";
+import SignInPage from "./pages/SignInPage";
+import CreatePage from "./pages/CreatePage";
+import PostDetail from "./pages/PostDetail";
 const queryClient = new QueryClient();
 // Define routes using createBrowserRouter
 const router = createBrowserRouter([
@@ -26,8 +29,8 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <Home /> },
       { path: "home", element: <Home /> },
-      { path: "login", element: <Login /> },
-      { 
+      { path: "post/:postId" ,element: <PostDetail  />},
+      {
         element: <PrivateRoute />,
         children: [
           { path: "profile", element: <Profile /> },
@@ -40,6 +43,15 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFound /> }, 
     ],
   },
+  { path: "login", 
+    element: <LoginPage /> },
+  {
+    path: "signin",
+    element: <SignInPage/>
+  },
+  { path: "create",
+    element: <CreatePage/>
+  }
 ]);
 
 // Render the app

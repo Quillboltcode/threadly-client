@@ -1,8 +1,10 @@
 import React from 'react';
-import { FaCircleNotch } from 'react-icons/fa'
 import ThemeToggle from './ThemeToggle';
 import { ScreenMode } from '../App';
 import { useCommonTags } from '../hooks/useCommonTags';
+import { Tags } from '../types/tagResult';
+import LoadingSpinner from './LoadingSpinner';
+import toast from 'react-hot-toast';
 
 interface RightSidebarProps {
   mode: ScreenMode;
@@ -14,12 +16,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ mode }) => {
   const { data, error, isLoading } = useCommonTags();
 
 
-  if (isLoading){
-    return <div>Loading...</div>
-  }
-
   if (error) {
-    return <div>Error: {error.message}</div>;
+    toast.error(error.message);
+    return ;
   }
 
   return (
@@ -40,18 +39,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ mode }) => {
           </div>
 
           <div className="mb-4">
-            {/* Getting Started Section */}
-            <h2 className="text-gray-400 mb-2">GETTING STARTED</h2>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <FaCircleNotch />
-                <span>Like 10 posts</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <FaCircleNotch />
-                <span>Follow 7 accounts</span>
-              </div>
-            </div>
+      
             {/* Theme Toggle */}
             <div className="flex justify-end">
               <ThemeToggle />
@@ -68,7 +56,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ mode }) => {
           <div className="mb-4">
             <h2 className="text-gray-400 mb-2">Trending</h2>
             <div className="flex flex-wrap gap-2">
-              {data?.map((tag) => (
+              {isLoading && <LoadingSpinner />}
+
+              {data?.map((tag: Tags) => (
                 <span
                   key={tag.tag}
                   className="bg-gray-700 text-white px-2 py-1 rounded-full"

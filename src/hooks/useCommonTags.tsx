@@ -9,6 +9,6 @@ export const useCommonTags = () => {
             return data;
         },
         placeholderData : keepPreviousData,
-        staleTime: 1000 * 60 * 5, // cache for 5 minutes
+        staleTime: 1000 * 60 * 10, // cache for 5 minutes
     });
 }

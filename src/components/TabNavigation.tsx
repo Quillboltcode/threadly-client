@@ -2,10 +2,7 @@ import { useState } from "react";
 
 import { PiButterfly } from "react-icons/pi";
 
-const tabs = [
-    { id: "discover", label: "Discover" },
-    { id: "following", label: "Following" },
-];
+
 
 export default function TabNavigation() {
     const [activeTab, setActiveTab] = useState("discover");

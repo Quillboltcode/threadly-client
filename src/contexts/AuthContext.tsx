@@ -40,6 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     onSuccess: (data) => {
       // Save token to localStorage
       localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('loggedInUsers', JSON.stringify(data.user));
       // Update user data in the cache
       queryClient.setQueryData(['currentUser'], data.user);
       // Instead of using navigate, we'll handle redirects in the component calling login
