@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FiMessageCircle, FiSettings } from "react-icons/fi";
 
 const MessagePage = () => {
-  const [chats, setChats] = useState<string[]>([]);
+  const [chats] = useState<string[]>([]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-900 text-white">

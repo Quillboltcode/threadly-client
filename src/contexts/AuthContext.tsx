@@ -68,7 +68,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // Add a response interceptor - implement as needed
-    // This is a simplified example
+    if (error) {
+      handleUnauthorized();
+    }
     
     return () => {
       // Cleanup
@@ -76,7 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [queryClient]);
 
   const login = async (credentials: LoginCredentials, redirectUrl = '/profile') => {
-    const result = await loginMutation.mutateAsync(credentials);
+    await loginMutation.mutateAsync(credentials);
     // Use window.location for navigation after login if needed
     if (redirectUrl) {
       window.location.href = redirectUrl;

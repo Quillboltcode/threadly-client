@@ -8,7 +8,7 @@ const PasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const [ email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, error, isLoading } = useAuth();    
+  const { login } = useAuth();    
 
   useEffect(() => {
     // Retrieve the username from the route state

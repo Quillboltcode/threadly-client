@@ -14,7 +14,7 @@ const Profile: React.FC = () => {
   //   postcount: 50
   // };
 
-  const { user, isLoading, isAuthenticated} = useAuth();
+  const { user, isLoading} = useAuth();
 
   //todo add count for followers, following, and posts
   const followers_count = (user as any).followers?.length;
