@@ -9,10 +9,9 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 const Home = () => {
   const { data, isLoading, isError } = usePosts();
-
   if (isLoading) return <LoadingSpinner />
   if (isError) return <p className="text-center text-red-500 mt-10">Error fetching posts</p>;
-  // console.log(data)
+  console.log(data)
   const sanitizeData = data?.map((post) => post)|| [];
   return (
     <div className="max-w-2xl md:w-full mx-auto p-4">

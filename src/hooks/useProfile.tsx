@@ -7,26 +7,20 @@ import { UserService } from "../services/userServices";
 const PROFILE_QUERY_KEY = ['user', 'profile'];
 
 /**
- * Fetch the current user profile
- */
-// export const useProfile = () => {
-//   return useQuery({
-//     queryKey: PROFILE_QUERY_KEY,
-//     queryFn: UserService.getProfile,
-//   });
-// };
-
-/**
- * Update the current user profile
+ * Hook to update the current user profile
  */
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (user: User) => UserService.updateProfile(user),
+    mutationFn: (updatedData: Partial<User>) => UserService.updateProfile(updatedData),
     onSuccess: () => {
-      // Invalidate and refetch the user profile
+      // Invalidate and refetch the user profile after a successful update
       queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
+    },
+    onError: (error: Error) => {
+      // Handle error (e.g., show a toast notification or log the error)
+      console.error("Failed to update profile:", error.message);
     },
   });
 };

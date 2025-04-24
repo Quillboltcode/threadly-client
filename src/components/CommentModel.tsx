@@ -10,6 +10,10 @@ interface CommentBoxProps {
 }
 
 const CommentBox: React.FC<CommentBoxProps> = ( { post, onChange, onSubmit, onClose }) => {
+  const avatarsrc = post.author.avatar.startsWith('/uploads/')
+  ? `${import.meta.env.VITE_APP_UPLOAD}${post.author.avatar}`
+  : post.author.avatar || '/assets/default-avatar.png';
+
   const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -32,12 +36,12 @@ const CommentBox: React.FC<CommentBoxProps> = ( { post, onChange, onSubmit, onCl
       {/* User Info + Message */}
       <div className="flex items-start gap-3">
         <img
-          src={post.author.avatar}
+          src={avatarsrc}
           alt="User Avatar"
           className="w-10 h-10 rounded-full"
         />
         <div className="flex flex-col text-sm">
-          <span className="font-semibold text-white">{post.author.name}</span>
+          <span className="font-semibold text-white">{post.author.username}</span>
           <p className="text-gray-300 mt-1">
             {post.content}
           </p>

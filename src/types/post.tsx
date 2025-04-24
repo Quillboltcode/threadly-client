@@ -1,17 +1,16 @@
 export interface Post {
     id: string;
     content: string;
-    tag: string[];
+    tags: string[];
     createdAt: string;
     updatedAt: string;
     image: string[]|null;
-    like: number;   
-    share: number;
-    comment: string[];
+    likeCount: number;   
+    comments: string[];
     commentcount: number;
     author :{
       id: string | undefined;
-      name: string;
+      username: string;
       firstname: string;
       lastname: string;
       email: string;

@@ -6,7 +6,7 @@ import RightSidebar from './components/RightSidebar';
 import { Outlet } from 'react-router';
 import { debounce } from 'es-toolkit';
 import { Toaster } from 'react-hot-toast';
-import { PostBoxModal } from './components/PostBox';
+import  PostBoxModal  from './components/PostBoxModal';
 
 
 export enum ScreenMode {

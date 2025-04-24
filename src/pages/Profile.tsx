@@ -15,11 +15,12 @@ const Profile: React.FC = () => {
   // };
 
   const { user, isLoading} = useAuth();
-
+  console.log(user?.avatar)
   //todo add count for followers, following, and posts
   const followers_count = (user as any).followers?.length;
   const following_count = (user as any).following?.length;
   // const postCount = user.posts.length;
+  const avatar = import.meta.env.VITE_APP_UPLOAD + user?.avatar
 
   if (!user || isLoading) {
     return <LoadingSpinner/>
@@ -40,7 +41,7 @@ const Profile: React.FC = () => {
           {/* Profile Picture */}
           <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center border-4 border-gray-900">
             {user.avatar &&
-              <img src={user.avatar} alt="User Profile" aria-label="User Profile Picture" className="w-full h-full rounded-full" />
+              <img src={avatar} alt="User Profile" aria-label="User Profile Picture" className="w-full h-full rounded-full" />
             }
 
             {!user.avatar &&

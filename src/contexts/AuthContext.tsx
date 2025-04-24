@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [queryClient]);
 
-  const login = async (credentials: LoginCredentials, redirectUrl = '/profile') => {
+  const login = async (credentials: LoginCredentials, redirectUrl = '/') => {
     await loginMutation.mutateAsync(credentials);
     // Use window.location for navigation after login if needed
     if (redirectUrl) {

@@ -20,9 +20,11 @@ const PostDetail: React.FC = () => {
   if (isError) {
     return <div className="text-red-400">Error loading post: {error?.message || 'Unknown error'}</div>;
   }
-
+  
   const post = data;
-
+  const avatar = post.author.avatar.startsWith('/uploads/')
+  ? `${import.meta.env.VITE_APP_UPLOAD}${post.author.avatar}`
+  : post.author.avatar;
   return (
     <div className="bg-[#1E1F22] text-white p-4 rounded-lg">
       {/* Back button*/}
@@ -36,7 +38,7 @@ const PostDetail: React.FC = () => {
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <img
-          src={post.author.avatar}
+          src={avatar}
           alt="Author Avatar"
           className="w-8 h-8 rounded-full"
         />
@@ -101,7 +103,7 @@ const PostDetail: React.FC = () => {
             <img
               src={comment.author.avatar}
               alt="Comment Author Avatar"
-              className="w-8 h-8 rounded-full"
+              className="w-8 h-8 rounded-full overflow-hidden"
             />
             <div>
               <div className="flex items-center gap-2">

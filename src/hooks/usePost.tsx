@@ -52,7 +52,9 @@ export const useCreatePost = (options: UseCreatePostOptions = {}) => {
     }
     
     if (data.file) {
-      formData.append('file', data.file);
+      data.file.forEach((file: any) => {
+        formData.append('images', file);
+      });
       
       if (data.attachmentType) {
         formData.append('attachmentType', data.attachmentType);
@@ -77,4 +79,45 @@ export const useCreatePost = (options: UseCreatePostOptions = {}) => {
   };
 };
 
+export const useUpdatePost = (options: UseCreatePostOptions = {}) => {
+  const queryClient = useQueryClient();
+  
+  const updatePostMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string, data: CreatePostData }) => {
+      const formData = prepareFormData(data);
+      return PostService.updatePost(id, formData);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['post', data.id] }); // If you have individual post queries
+      options.onSuccess?.(data);
+    },
+    onError: (error: Error) => {
+      options.onError?.(error);
+    }
+  });
 
+  const prepareFormData = (data: CreatePostData): FormData => {
+    const formData = new FormData();
+    
+    if (data.content) formData.append('content', data.content);
+    if (data.file) {
+      data.file.forEach((file: any) => {
+        formData.append('images', file);
+      });
+      if (data.attachmentType) formData.append('attachmentType', data.attachmentType);
+    }
+    
+    return formData;
+  };
+
+  return {
+    updatePost: (id: string, data: CreatePostData) => 
+    updatePostMutation.mutate({ id, data }),
+    isPending: updatePostMutation.isPending,
+    isError: updatePostMutation.isError,
+    error: updatePostMutation.error,
+    isSuccess: updatePostMutation.isSuccess,
+    data: updatePostMutation.data
+  };
+};

@@ -8,7 +8,7 @@ const url = import.meta.env.VITE_API_URL ? 'http://localhost:8500/api' : 'https:
 
 export interface CreatePostData {
   content: string;
-  file?: File;
+  file?: any[];
   attachmentType?: string;
 }
 
@@ -47,48 +47,30 @@ export class PostService  {
   // api/posts?page=1&limit=10
   static async getPosts(page = 1, limit = 10): Promise<Post[]> {
     const response = await axios.get(`${url}/posts?page=${page}&limit=${limit}`);
-    // respone are :
-    /* {
-      "totalPosts": 5,
-      "page": 1,
-      "totalPages": 1,
-      "limit": 10,
-      "posts": [
-        {
-          "content": "Just finished a 10K run! 🏃‍♂️",
-          "tags": [
-            "fitness",
-            "running"
-          ],
-          "author": {},
-          "image": [],
-          "likeCount": 39,
-          "commentCount": 0,
-          "createdAt": {},
-          "updatedAt": {}
-        }, */
-        const posts = response.data.posts.map((post: any) => ({
-          id: post._id,
-          content: post.content,
-          tag: post.tags,
-          createdAt: post.createdAt,
-          updatedAt: post.updatedAt,
-          image: post.image,
-          like: post.likeCount,// assuming share count is not provided in the response
-          comment: post.comment,
-          commentcount: post.commentCount,
-          author: {
-            id: post.author._id,
-            firstname: post.author.firstname,
-            lastname: post.author.lastname,
-            name: post.author.username,
-            email: post.author.email,
-            avatar: post.author.avatar,
-          },
-        })) as Post[];
-      
-        return posts;
-      }
+    
+    const posts = response.data.posts.map((post: any) => ({
+      id: post._id,
+      content: post.content,
+      tags: post.tags,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      image: post.image,
+      like: post.likeCount,
+      commentcount: post.commentCount,
+      author: {
+        id: post.author._id,
+        firstname: post.author.firstName,
+        lastname: post.author.lastName,
+        username: post.author.username,
+        email: post.author.email ?? '', // if email is optional or missing
+        avatar: post.author.avatar,
+      },
+       // optional: include if needed
+    })) as Post[];
+    // console.log(posts);
+    return posts;
+  }
+  
 
   static async getSinglePost(id: string): Promise<any>{
     if (!id) {
@@ -122,7 +104,7 @@ export class PostService  {
   //Update post api with auth-header
   static async updatePost(id: string, post: any): Promise<any>{
     const response = await axios.put(`${url}/posts/${id}`, post,{
-      headers: PostService.getHeaders(true, false),
+      headers: PostService.getHeaders(true, true),
     });
     return response.data;
   }

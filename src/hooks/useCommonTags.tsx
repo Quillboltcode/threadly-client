@@ -12,3 +12,4 @@ export const useCommonTags = () => {
         staleTime: 1000 * 60 * 10, // cache for 5 minutes
     });
 }
+
