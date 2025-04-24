@@ -15,6 +15,9 @@ export class UserService {
         if (!isFormData) {
             headers['Content-Type'] = 'application/json';
         }
+        if (isFormData) {
+            headers['Content-Type'] = 'multipart/form-data';
+        }
         return headers;
     }
     // api/users/profile already exist in useAuth context and will be used there

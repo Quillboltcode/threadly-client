@@ -1,21 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { FiBell, FiCheckCircle, FiAlertCircle, FiInfo, FiX } from 'react-icons/fi';
+import { FiBell, FiCheckCircle, FiAlertCircle, FiInfo, FiX, FiHeart, FiMessageCircle, FiEdit, FiTrash } from 'react-icons/fi';
 import { io, Socket } from 'socket.io-client';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'like' | 'comment' | 'post_edit' | 'post_delete';
   read: boolean;
   timestamp: Date;
+  postId?: string;
 }
+// Map to type notify
+const getNotificationIcon = (type: string) => {
+  switch(type) {
+    case 'success': 
+      return <FiCheckCircle className="w-5 h-5 text-green-500" />;
+    case 'error': 
+      return <FiAlertCircle className="w-5 h-5 text-red-500" />;
+    case 'like': 
+      return <FiHeart className="w-5 h-5 text-red-500" />;
+    case 'comment': 
+      return <FiMessageCircle className="w-5 h-5 text-blue-500" />;
+    case 'post_edit': 
+      return <FiEdit className="w-5 h-5 text-yellow-500" />;
+    case 'post_delete': 
+      return <FiTrash className="w-5 h-5 text-red-500" />;
+    default: 
+      return <FiInfo className="w-5 h-5 text-blue-500" />;
+  }
+};
 
 const NotificationPage: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
-
+  const {  user } = useAuth();
   useEffect(() => {
     // Request permission for browser notifications
     if ("Notification" in window) {
@@ -23,15 +44,31 @@ const NotificationPage: React.FC = () => {
     }
 
     // Connect to socket server
-    const socketConnection = io(import.meta.env.VITE_APP_UPLOAD);
-    setSocket(socketConnection);
-
-    // Listen for notifications
-    socketConnection.on('notification', (notification: Notification) => {
-      addNotification(notification);
-      showBrowserNotification(notification);
+    const socketConnection = io(import.meta.env.VITE_APP_UPLOAD, {
+      withCredentials: true, // Required the same as http sever socket io
     });
-
+    setSocket(socketConnection);
+    // Get user ID from auth context/local storage
+    const userId = user?._id;
+    if (userId) {
+      socketConnection.emit('user_connected', userId);
+    }
+    // Listen for notifications
+    socketConnection.on('notification', (serverNotification: any) => {
+      const clientNotification: Notification = {
+        id: serverNotification.id || Math.random().toString(36).substr(2, 9),
+        title: serverNotification.title || "New Notification", // Fallback
+        message: serverNotification.message,
+        type: serverNotification.type,
+        read: serverNotification.read,
+        timestamp: serverNotification.createdAt || new Date(),
+        postId: serverNotification.postId
+      };
+      addNotification(clientNotification);
+    });
+    socketConnection.on('connect_error', (err) => {
+      console.error('Socket connection error:', err);
+    });
     // Clean up socket connection
     return () => {
       socketConnection.disconnect();
@@ -51,13 +88,13 @@ const NotificationPage: React.FC = () => {
   };
 
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(n => ({ ...n, read: true }))
     );
   };
@@ -70,14 +107,14 @@ const NotificationPage: React.FC = () => {
     setNotifications([]);
   };
 
-  const filteredNotifications = showUnreadOnly 
-    ? notifications.filter(n => !n.read) 
+  const filteredNotifications = showUnreadOnly
+    ? notifications.filter(n => !n.read)
     : notifications;
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const getNotificationIcon = (type: string) => {
-    switch(type) {
+    switch (type) {
       case 'success': return <FiCheckCircle className="w-5 h-5 text-green-500" />;
       case 'error': return <FiAlertCircle className="w-5 h-5 text-red-500" />;
       case 'info': return <FiInfo className="w-5 h-5 text-blue-500" />;
@@ -119,13 +156,13 @@ const NotificationPage: React.FC = () => {
             )}
           </h1>
           <div className="flex space-x-4">
-            <button 
+            <button
               onClick={markAllAsRead}
               className="text-sm bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded"
             >
               Mark all as read
             </button>
-            <button 
+            <button
               onClick={clearAllNotifications}
               className="text-sm bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded"
             >
@@ -141,8 +178,8 @@ const NotificationPage: React.FC = () => {
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
               <label className="flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={showUnreadOnly}
                   onChange={() => setShowUnreadOnly(!showUnreadOnly)}
                   className="form-checkbox h-4 w-4 text-blue-600 rounded"
@@ -150,7 +187,7 @@ const NotificationPage: React.FC = () => {
                 <span className="ml-2 text-gray-700 dark:text-gray-300">Show unread only</span>
               </label>
             </div>
-            <button 
+            <button
               onClick={addSampleNotification}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
             >
@@ -166,13 +203,12 @@ const NotificationPage: React.FC = () => {
               </div>
             ) : (
               filteredNotifications.map((notification) => (
-                <div 
-                  key={notification.id} 
-                  className={`border rounded-lg p-4 flex relative ${
-                    notification.read 
-                      ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700' 
+                <div
+                  key={notification.id}
+                  className={`border rounded-lg p-4 flex relative ${notification.read
+                      ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                       : 'bg-white dark:bg-gray-700 border-blue-200 dark:border-blue-800'
-                  }`}
+                    }`}
                 >
                   <div className="mr-4 pt-1">
                     {getNotificationIcon(notification.type)}
@@ -196,7 +232,7 @@ const NotificationPage: React.FC = () => {
                     </p>
                     <div className="mt-2 flex space-x-2">
                       {!notification.read && (
-                        <button 
+                        <button
                           onClick={() => markAsRead(notification.id)}
                           className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                         >
@@ -205,7 +241,7 @@ const NotificationPage: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => deleteNotification(notification.id)}
                     className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >

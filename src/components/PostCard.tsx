@@ -23,12 +23,14 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
 
   // console.log(user?._id); // Check if the current user is the author
   const navigate = useNavigate();
-  console.log(post.author);
-  const avatar = post.author?.avatar
+  // console.log(post.like);
+  const avatarsrc = post.author?.avatar
   ? post.author.avatar.startsWith('/uploads/')
     ? `${import.meta.env.VITE_APP_UPLOAD}${post.author.avatar}`
     : post.author.avatar
   : '/assets/default-avatar.png';
+  console.log(avatarsrc)
+
   const authorName = post.author.username
   ? `${post.author.firstname || ''} ${post.author.lastname || ''}`.trim()
   : 'Unknown Author';
@@ -84,7 +86,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
       {/* Author Details */}
       <div className="flex items-center mb-2">
         <img
-          srcSet={avatar}
+          src={avatarsrc}
           alt={authorName}
           className="w-10 h-10 rounded-full mr-2 overflow-hidden"
         />
@@ -129,7 +131,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
 
       {/* Action Buttons */}
       <div className="flex justify-between items-center mt-3 text-gray-400">
-        <LikeBtn postid={post.id} like={post.likeCount} />
+        <LikeBtn postid={post.id} like={post.like} />
         <div onClick={(e) => {
           e.stopPropagation(); // Prevent triggering the parent onClick
           if (!isAuthenticated) {

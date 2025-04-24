@@ -5,7 +5,7 @@ export interface Post {
     createdAt: string;
     updatedAt: string;
     image: string[]|null;
-    likeCount: number;   
+    like: number;   
     comments: string[];
     commentcount: number;
     author :{

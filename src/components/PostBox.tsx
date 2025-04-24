@@ -123,7 +123,7 @@ const PostBox: React.FC<PostBoxProps> = ({
 
   const handleSubmit = () => {
     if (isEditing && postToEdit) {
-      updatePost(postToEdit._id, {
+      updatePost(postToEdit.id, {
         content,
         file: attachments.length > 0 ? attachments : undefined,
         attachmentType: attachmentType || undefined,

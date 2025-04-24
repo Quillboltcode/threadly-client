@@ -13,46 +13,42 @@ export interface PostProps {
 export const useLikePost = () => {
   return useMutation({
     mutationFn: PostService.likePost,
-    onSuccess: (data) => {
-      console.log(data);
-      toast.success("Liked post");
-    },
-    onError: (error) => {
-      console.error(error);
-      toast.error("Error liking post");
-    },
   });
 };
 
-const LikeBtn: React.FC<PostProps> = ({ like, postid }) => {
-  const [newLike, setLike] = useState(like); // Local state for like count
-  const [isLiked, setIsLiked] = useState(false); // Track if the user has liked the post
-  const { mutate: likePost } = useLikePost();
-  
-  const handleLike = (e: React.MouseEvent<SVGGElement>) => {
-    e.stopPropagation(); // Prevent event bubbling
+const LikeBtn: React.FC<PostProps> = ({ like: initialLike, postid }) => {
+  const [newLike, setLike] = useState(initialLike);
+  const [isLiked, setIsLiked] = useState(false);
+  const { mutateAsync: likePost } = useLikePost();
 
-    // Optimistically update the like count
-    const updatedLikeCount = isLiked ? newLike - 1 : newLike + 1;
-    setLike(updatedLikeCount); // Update the local state
-    setIsLiked(!isLiked); // Toggle the like state
+  const handleLike = async (e: React.MouseEvent<SVGGElement>) => {
+    e.stopPropagation();
 
-    // Send the POST request to the server
-    likePost(
-      postid , // Pass the post ID to the mutation function
-      {
-        // Handle success and error cases
-        onSuccess: () => {
-          toast.success("Like successful");
-        },
-        onError: () => {
-          // Revert the optimistic update in case of an error
-          setLike(newLike); // Revert to the previous like count
-          setIsLiked(isLiked); // Revert the like state
-          toast.error("Error liking post");
-        },
+    const previousLike = newLike;
+    const previousIsLiked = isLiked;
+
+    // Optimistic update
+    const updatedLike = isLiked ? newLike - 1 : newLike + 1;
+    setLike(updatedLike);
+    setIsLiked(!isLiked);
+
+    try {
+      const data = await likePost(postid);
+      // Update state with server's response
+      setLike(data.likeCount);
+      // Determine isLiked based on the server's response
+      if (data.likeCount > previousLike) {
+        setIsLiked(true);
+      } else {
+        setIsLiked(false);
       }
-    );
+      toast.success(data.message);
+    } catch (error) {
+      // Revert on error
+      setLike(previousLike);
+      setIsLiked(previousIsLiked);
+      toast.error("Error liking post");
+    }
   };
 
   return (

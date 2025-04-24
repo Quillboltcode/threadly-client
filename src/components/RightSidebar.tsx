@@ -5,16 +5,20 @@ import { useCommonTags } from '../hooks/useCommonTags';
 import { Tags } from '../types/tagResult';
 import LoadingSpinner from './LoadingSpinner';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router';
 
 interface RightSidebarProps {
   mode: ScreenMode;
   setMode: React.Dispatch<React.SetStateAction<ScreenMode>>;
 }
 
-
 const RightSidebar: React.FC<RightSidebarProps> = ({ mode }) => {
   const { data, error, isLoading } = useCommonTags();
+  const navigate = useNavigate();
 
+  const goToSearchWithQuery = (searchTerm: string) => {
+    navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+  };
 
   if (error) {
     toast.error(error.message);
@@ -59,12 +63,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ mode }) => {
               {isLoading && <LoadingSpinner />}
 
               {data?.map((tag: Tags) => (
-                <span
+                <button
                   key={tag.tag}
                   className="bg-gray-700 text-white px-2 py-1 rounded-full"
+                  onClick={()=> goToSearchWithQuery(tag.tag)}
                 >
                   {tag.tag}
-                </span>
+                </button>
               ))}
             </div>
           </div>

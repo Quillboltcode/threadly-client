@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import SearchService from '../services/searchService';
 import { Post } from '../types/post';
 import LoadingSpinner from '../components/LoadingSpinner';
 import PostCard from '../components/PostCard';
+import { useSearchParams } from 'react-router';
 
 const SearchPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState<string>('');
   const [searchTriggered, setSearchTriggered] = useState<boolean>(false); // Track if a search has been triggered
 
@@ -20,11 +22,26 @@ const SearchPage: React.FC = () => {
 
   const searchResults: Post[] = data || [];
 
+  // Extract query from URL when component mounts or URL changes
+  useEffect(() => {
+    const urlQuery = searchParams.get('q');
+    if (urlQuery) {
+      setQuery(urlQuery);
+      // Trigger search with the URL query
+      setSearchTriggered(true);
+      // Use setTimeout to ensure state is updated before refetch
+      setTimeout(() => {
+        refetch();
+      }, 0);
+    }
+  }, [searchParams, refetch]);
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) {
       // Clear results and reset the UI state
       setSearchTriggered(false);
+      setSearchParams({});
       return;
     }
 
