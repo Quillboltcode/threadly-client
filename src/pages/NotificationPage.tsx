@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiBell, FiCheckCircle, FiAlertCircle, FiInfo, FiX, FiHeart, FiMessageCircle, FiEdit, FiTrash } from 'react-icons/fi';
+import { FiBell, FiCheckCircle, FiAlertCircle, FiInfo, FiX } from 'react-icons/fi';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -13,30 +13,14 @@ interface Notification {
   postId?: string;
 }
 // Map to type notify
-const getNotificationIcon = (type: string) => {
-  switch(type) {
-    case 'success': 
-      return <FiCheckCircle className="w-5 h-5 text-green-500" />;
-    case 'error': 
-      return <FiAlertCircle className="w-5 h-5 text-red-500" />;
-    case 'like': 
-      return <FiHeart className="w-5 h-5 text-red-500" />;
-    case 'comment': 
-      return <FiMessageCircle className="w-5 h-5 text-blue-500" />;
-    case 'post_edit': 
-      return <FiEdit className="w-5 h-5 text-yellow-500" />;
-    case 'post_delete': 
-      return <FiTrash className="w-5 h-5 text-red-500" />;
-    default: 
-      return <FiInfo className="w-5 h-5 text-blue-500" />;
-  }
-};
 
 const NotificationPage: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
   const {  user } = useAuth();
+  
+  console.log(socket)
   useEffect(() => {
     // Request permission for browser notifications
     if ("Notification" in window) {
